@@ -1,0 +1,66 @@
+Now that we have initial access, let's use token impersonation to gain system access.
+Windows uses tokens to ensure that account have right privs to make some action that requires them. This is done by LSASS.exe.
+
+
+This acess token consist of:
+  -user SIDs(security identifier)
+  -group SIDs
+  -privileges
+
+
+
+There are two types of access tokens:
+  -primary access tokens: those associated with a user account that are generated on log on
+  -impersonation tokens: these allow a particular process(or thread in a process) to gain access to resources using the token of another (user/client) process
+  
+
+The privileges of an account(which are either given to the account when created or inherited from a group) allow a user to carry out particular actions. 
+Here are the most commonly abused privileges:
+
+SeImpersonatePrivilege
+SeAssignPrimaryPrivilege
+SeTcbPrivilege
+SeBackupPrivilege
+SeRestorePrivilege
+SeCreateTokenPrivilege
+SeLoadDriverPrivilege
+SeTakeOwnershipPrivilege
+SeDebugPrivilege
+
+I create a shell and view all privilages using whoami /priv, output:
+
+Privilege Name                  Description                               State   
+=============================== ========================================= ========
+SeIncreaseQuotaPrivilege        Adjust memory quotas for a process        Disabled
+SeSecurityPrivilege             Manage auditing and security log          Disabled
+SeTakeOwnershipPrivilege        Take ownership of files or other objects  Disabled
+SeLoadDriverPrivilege           Load and unload device drivers            Disabled
+SeSystemProfilePrivilege        Profile system performance                Disabled
+SeSystemtimePrivilege           Change the system time                    Disabled
+SeProfileSingleProcessPrivilege Profile single process                    Disabled
+SeIncreaseBasePriorityPrivilege Increase scheduling priority              Disabled
+SeCreatePagefilePrivilege       Create a pagefile                         Disabled
+SeBackupPrivilege               Back up files and directories             Disabled
+SeRestorePrivilege              Restore files and directories             Disabled
+SeShutdownPrivilege             Shut down the system                      Disabled
+SeDebugPrivilege                Debug programs                            Enabled 
+SeSystemEnvironmentPrivilege    Modify firmware environment values        Disabled
+SeChangeNotifyPrivilege         Bypass traverse checking                  Enabled 
+SeRemoteShutdownPrivilege       Force shutdown from a remote system       Disabled
+SeUndockPrivilege               Remove computer from docking station      Disabled
+SeManageVolumePrivilege         Perform volume maintenance tasks          Disabled
+SeImpersonatePrivilege          Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege         Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege   Increase a process working set            Disabled
+SeTimeZonePrivilege             Change the time zone                      Disabled
+SeCreateSymbolicLinkPrivilege   Create symbolic links                     Disabled
+
+
+We see that SeDebugPrivilege, SeImpersonatePrivilege) are enabled. I used incognito module that will allow me to exploit this vuln: use incognito.
+Then we list_tokens. We can see that the BUILTIN\Administrators token is available. 
+Use the impersonate_token "BUILTIN\Administrators" command to impersonate the Administrators token.
+
+Thats how I get the AUTORITY SYSTEM token but even though you have a higher privileged token you may not actually have the permissions of a privileged user.
+This is due to the way Windows handles permissions - it uses the Primary Token of the process and not the impersonated token to determine what the process can or cannot do. 
+Migrate to a process with correct permissions which is services.exe.
+I got permissions to go to C:\Windows\System32\config and full acess of the system
