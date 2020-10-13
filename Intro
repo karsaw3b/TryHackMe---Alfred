@@ -1,4 +1,6 @@
- In this room we will learn how to take advantage of frequent misconfigurations on a commonly used automation server
+Link: https://tryhackme.com/room/alfred
+
+In this room we will learn how to take advantage of frequent misconfigurations on a commonly used automation server
 Jenkins - Allow developers to automatically deploy code as changes are made to it
 We will then use the interesting privesc method to become NT AUTHORITY SYSTEM in windows, because this operating system will be penetrated
 
