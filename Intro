@@ -1,0 +1,11 @@
+  In this room we will learn how to take advantage of frequent misconfigurations on a commonly used automation server
+Jenkins - Allow developers to automatically deploy code as changes are made to it
+We will then use the interesting privesc method to become NT AUTHORITY SYSTEM in windows, because this operating system will be penetrated
+
+Here's an interesting powershell script that works just like a reverse shell (you don't need to change anything in it):
+https://github.com/samratashok/nishang/blob/master/Shells/Invoke-PowerShellTcp.ps1
+
+We copied it from the library on github which contains loads of useful scripts for initial acess, enum and privilege escalation:
+https://github.com/samratashok/nishang
+
+
